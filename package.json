@@ -1,6 +1,6 @@
 {
   "name": "@zcorky/lru",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A simple lru",
   "main": "lib/index.js",
   "repository": "https://github.com/zcorky/lru",
