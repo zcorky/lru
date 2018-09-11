@@ -14,7 +14,7 @@ export interface LRU<K, T> {
 }
 
 export interface Item<T> {
-  expired: number;
+  expired?: number;
   value?: T
 }
 

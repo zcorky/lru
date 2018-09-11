@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { delay } from '@zcorky/delay';
+import { delay as sleep } from '@zcorky/delay';
 import { lru as LRU } from '../src';
 
 export interface Value {
@@ -8,7 +8,19 @@ export interface Value {
 };
 
 describe('Lru tests', () => {
-  describe('normal', () => {
+  describe('create instance', () => {
+    it('using new', () => {
+      const lru = new LRU<string, number>(10);
+      expect(lru instanceof LRU).to.equal(true);
+    });
+
+    it('using create', () => {
+      const lru = LRU.create<string, number>(10);
+      expect(lru instanceof LRU).to.equal(true);
+    });
+  });
+
+  describe('key & value', () => {
     it('key is string', () => {
       const lru = new LRU<string, string>(10);
       lru.set('foo', 'bar');
@@ -45,7 +57,7 @@ describe('Lru tests', () => {
     it('value is object', () => {
       const lru = new LRU<string, { foo: string }>(10);
       lru.set('foo', { foo: 'bar' });
-      expect((lru.get('foo') as { foo: string }).foo).to.equal('bar');
+      expect(lru.get('foo')!.foo).to.equal('bar');
     });
 
     it('expired value should not copy', async () => {
@@ -55,12 +67,92 @@ describe('Lru tests', () => {
 
       expect((lru as any).cache.size).to.equal(0);
       expect((lru as any)._cache.size).to.equal(2);
+      // expect(lru.get('foo1', { maxAge: 2 })).to.equal('bar');
 
-      await delay(10);
+      await sleep(10);
       expect(lru.get('foo')).to.equal(undefined);
       expect(lru.get('foo1')).to.equal('bar');
       expect((lru as any).cache.size).to.equal(1);
       expect((lru as any)._cache.size).to.equal(2);
+
+      await sleep(10);
+      expect(lru.get('foo')).to.equal(undefined);
+      expect(lru.get('foo1')).to.equal('bar');
+      expect((lru as any).cache.size).to.equal(1);
+      expect((lru as any)._cache.size).to.equal(2);
+
+      lru.set('foo2', 'bar');
+      expect((lru as any).cache.size).to.equal(0);
+      expect((lru as any)._cache.size).to.equal(2);
+      expect(lru.get('foo')).to.equal(undefined);
+      expect(lru.get('foo2')).to.equal('bar');
+      expect((lru as any).cache.size).to.equal(1);
+      expect((lru as any)._cache.size).to.equal(2);
     });
-  })
+  });
+
+  describe('set with options.maxAge', () => {
+    [1, 10, 100, 1000, 1500].forEach(maxAge => {
+      it(`maxAge=${maxAge}`, async () => {
+        const lru = new LRU<string | number, string | number | object>(10);
+        lru.set(1, 0, { maxAge });
+        lru.set('k2', 'v2', { maxAge });
+        lru.set('k3', { foo: 'bar' }, { maxAge });
+
+        expect(lru.get(1)).to.equal(0);
+        expect(lru.get('k2')).to.equal('v2');
+        expect((lru.get('k3') as any).foo).to.equal('bar');
+
+        await sleep(maxAge + 10);
+        expect(lru.get(1)).to.equal(undefined);
+        expect(lru.get('k2')).to.equal(undefined);
+        expect(lru.get('k3')).to.equal(undefined);
+      });
+    });
+  });
+
+  describe('get with options.maxAge', () => {
+    [100, 1000, 1500].forEach(maxAge => {
+      it(`maxAge=${maxAge}`, async () => {
+        const lru = new LRU<string | number, string | number | object>(10);
+        lru.set(1, 0, { maxAge });
+        lru.set('k2', 'v2', { maxAge });
+        lru.set('k3', { foo: 'bar' }, { maxAge });
+
+        expect(lru.get(1)).to.equal(0);
+        expect(lru.get('k2')).to.equal('v2');
+        expect((lru.get('k3') as any).foo).to.equal('bar');
+
+        await sleep(maxAge - 10);
+        expect(lru.get(1, { maxAge })).to.not.equal(undefined);
+        expect(lru.get('k2', { maxAge })).to.not.equal(undefined);
+        expect(lru.get('k3', { maxAge })).to.not.equal(undefined);
+
+        await sleep(maxAge - 10);
+        expect(lru.get(1, { maxAge })).to.not.equal(undefined);
+        expect(lru.get('k2', { maxAge })).to.not.equal(undefined);
+        expect(lru.get('k3', { maxAge })).to.not.equal(undefined);
+        expect(lru.get(1, { maxAge })).to.not.equal(undefined);
+        expect(lru.get('k2', { maxAge })).to.not.equal(undefined);
+        expect(lru.get('k3', { maxAge })).to.not.equal(undefined);
+      });
+    });
+
+    it('can update expired when item in _cache', async () => {
+      const lru = new LRU<string, string>(2);
+      lru.set('foo1', 'bar');
+      lru.set('foo2', 'bar', { maxAge: 100 });
+      lru.get('foo1', { maxAge: 100 });
+
+      await sleep(50);
+      expect(lru.get('foo1')).to.equal('bar');
+      expect(lru.get('foo2', { maxAge: 0 })).to.equal('bar');
+      expect(lru.get('foo2', { maxAge: 0 })).to.equal('bar');
+      expect(lru.get('foo2', { maxAge: 0 })).to.equal('bar');
+
+      await sleep(120);
+      expect(lru.get('foo')).to.equal(undefined);
+      expect(lru.get('foo2')).to.equal('bar');
+    });
+  });
 })
