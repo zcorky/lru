@@ -11,7 +11,15 @@ export interface LRU<K, T> {
   // forEach(fn: Function): void;
   // toJSON(): object;
   // toString(): string;
+  hits(): Hits
+  hasKey(key: K): boolean
 }
+
+export interface Hits {
+  count: number
+  rate: number
+}
+
 
 export interface Item<T> {
   expired?: number;
@@ -26,6 +34,8 @@ export class lru<K, T> implements LRU<K, T> { // tslint:disable-line
   private size = 0;
   private cache = new Map<K, Item<T>>();
   private _cache = new Map<K, Item<T>>();
+  private _hitCount = 0;
+  private _missCount = 0;
 
   constructor(private limit: number = 10) {
   }
@@ -39,9 +49,15 @@ export class lru<K, T> implements LRU<K, T> { // tslint:disable-line
     const maxAge = option && option.maxAge;
     if (item) {
       if (item.expired && getNow() > item.expired) {
+        // @miss
+        this._missCount ++;
+
         item.expired = 0;
         item.value = undefined;
       } else {
+        // @hit
+        this._hitCount ++;
+
         if (maxAge !== undefined) {
           const expired = maxAge ? getNow() + maxAge : 0;
           item.expired = expired
@@ -54,9 +70,15 @@ export class lru<K, T> implements LRU<K, T> { // tslint:disable-line
     item = this._cache.get(key);
     if (item) {
       if (item.expired && getNow() > item.expired) {
+        // @miss
+        this._missCount ++;
+
         item.expired = 0;
         item.value = undefined;
       } else {
+        // @hit
+        this._hitCount ++;
+
         this._updateCache(key, item);
 
         if (maxAge !== undefined) {
@@ -67,6 +89,9 @@ export class lru<K, T> implements LRU<K, T> { // tslint:disable-line
 
       return item.value;
     }
+
+    // @miss
+    this._missCount ++;
   }
 
   public set(key: K, value: T, option?: Option): void {
@@ -91,6 +116,17 @@ export class lru<K, T> implements LRU<K, T> { // tslint:disable-line
       this._cache = this.cache;
       this.cache = new Map();
     }
+  }
+
+  public hasKey(key: K) {
+    return this.cache.has(key) || this._cache.has(key);
+  }
+
+  public hits() {
+    return {
+      count: this._hitCount,
+      rate: this._hitCount / ((this._hitCount + this._missCount) || 1),
+    };
   }
 }
 
