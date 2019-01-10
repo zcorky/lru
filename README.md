@@ -35,8 +35,9 @@ lru.set(key2, value2, { maxAge: 5000 });
 lru.get(key2, { maxAge: 5000 });
 ```
 
-### Relatived Reposities
+### Relative Reposities
 * [ylru](https://github.com/node-modules/ylru): Add "expire", "allow set empty value" extends on hashlru.
+* [flru](https://github.com/lukeed/flru): A tiny (215B) and fast Least Recently Used (LRU) cache.
 
 ## License
 
