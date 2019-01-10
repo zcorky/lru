@@ -10,7 +10,8 @@
 ![license](https://img.shields.io/github/license/zcorky/lru.svg)
 [![issues](https://img.shields.io/github/issues/zcorky/lru.svg)](https://github.com/zcorky/lru/issues)
 
-> A simple lru lib
+> A tiny and fast Leat Recently Used(LRU) cache, written by typescript.
+> Supports "expire" and "hits".
 
 ## Install
 
@@ -33,6 +34,9 @@ lru.get(key);
 lru.set(key2, value2, { maxAge: 5000 });
 // get key and update expired
 lru.get(key2, { maxAge: 5000 });
+
+// hits
+lru.hits(); // { count, rate }
 ```
 
 ### Relative Reposities
