@@ -1,6 +1,6 @@
 {
   "name": "@zcorky/lru",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A tiny and fast Leat Recently Used(LRU) cache, written by typescript",
   "main": "lib/index.js",
   "repository": "https://github.com/zcorky/lru",
