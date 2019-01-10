@@ -20,7 +20,6 @@ export interface Hits {
   rate: number
 }
 
-
 export interface Item<T> {
   expired?: number;
   value?: T

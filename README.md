@@ -1,6 +1,17 @@
-# LRU [![Build Status](https://travis-ci.org/zcorky/lru.svg?branch=master)](https://travis-ci.org/zcorky/lru)
+# lru
 
-> A simple lru lib
+[![NPM version](https://img.shields.io/npm/v/@zcorky/lru.svg?style=flat)](https://www.npmjs.com/package/@zcorky/lru)
+[![NPM quality](http://npm.packagequality.com/shield/%40zcorky%2Flru.svg)](http://packagequality.com/#?package=@zcorky/lru)
+[![Coverage Status](https://codecov.io/gh/zcorky/lru/branch/master/graph/badge.svg)](https://codecov.io/gh/zcorky/lru)
+[![Dependencies](https://img.shields.io/david/zcorky/lru.svg?style=flat-square)](https://david-dm.org/zcorky/lru)
+[![Build Status](https://travis-ci.com/zcorky/lru.svg?branch=master)](https://travis-ci.com/zcorky/lru)
+[![Known Vulnerabilities](https://snyk.io/test/npm/@zcorky/lru/badge.svg?style=flat-square)](https://snyk.io/test/npm/@zcorky/lru)
+[![NPM download](https://img.shields.io/npm/dm/@zcorky/lru.svg?style=flat-square)](https://www.npmjs.com/package/@zcorky/lru)
+![license](https://img.shields.io/github/license/zcorky/lru.svg)
+[![issues](https://img.shields.io/github/issues/zcorky/lru.svg)](https://github.com/zcorky/lru/issues)
+
+> A tiny and fast Leat Recently Used(LRU) cache, written by typescript.
+> Supports "expire" and "hits".
 
 ## Install
 
@@ -23,7 +34,14 @@ lru.get(key);
 lru.set(key2, value2, { maxAge: 5000 });
 // get key and update expired
 lru.get(key2, { maxAge: 5000 });
+
+// hits
+lru.hits(); // { count, rate }
 ```
+
+### Relative Reposities
+* [ylru](https://github.com/node-modules/ylru): Add "expire", "allow set empty value" extends on hashlru.
+* [flru](https://github.com/lukeed/flru): A tiny (215B) and fast Least Recently Used (LRU) cache.
 
 ## License
 
