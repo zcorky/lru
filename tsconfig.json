@@ -2,12 +2,12 @@
     "compilerOptions": {
         "moduleResolution": "node",
         "module": "commonjs",
-        "target": "es5",
+        "target": "es2018",
         "strictNullChecks": true,
         "noImplicitThis": true,
         "noUnusedLocals": true,
         "outDir": "lib",
-        "lib": ["es2015"],
+        "lib": ["es2018"],
         "declaration": true,
         "sourceMap": false,
         "removeComments": true
