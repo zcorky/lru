@@ -118,7 +118,12 @@ export class lru<K, T> implements LRU<K, T> { // tslint:disable-line
   }
 
   public hasKey(key: K) {
-    return this.cache.has(key) || this._cache.has(key);
+    if (this.cache.has(key) || this.cache.has(key)) {
+      const data = this.get(key);
+      return data !== undefined;
+    }
+
+    return false;
   }
 
   public hits() {
