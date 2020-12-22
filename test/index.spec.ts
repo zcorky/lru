@@ -153,5 +153,29 @@ describe('Lru tests', () => {
       expect(lru.get('foo')).toEqual(undefined);
       expect(lru.get('foo2')).toEqual('bar');
     });
+
+    it('has (hasKey)', async () => {
+      const lru = new LRU<string, string>(2);
+      expect(lru.has('foo1')).toBeFalsy();
+      
+      lru.set('foo1', 'bar', { maxAge: 100 });
+      lru.set('foo2', 'bar', { maxAge: 100 });
+
+      await sleep(50);
+      expect(lru.has('foo1')).toBeTruthy();
+      expect(lru.get('foo1')).toEqual('bar');
+      // console.log('xxx:', lru.get('foo2'), lru.has('foo2'));
+      expect(lru.has('foo2')).toBeTruthy();
+      expect(lru.get('foo2', { maxAge: 0 })).toEqual('bar');
+      expect(lru.has('foo2')).toBeTruthy();
+      expect(lru.get('foo2', { maxAge: 0 })).toEqual('bar');
+      expect(lru.get('foo2', { maxAge: 0 })).toEqual('bar');
+
+      await sleep(120);
+      expect(lru.has('foo1')).toBeFalsy();
+      expect(lru.get('foo1')).toEqual(undefined);
+      expect(lru.has('foo2')).toBeTruthy();
+      expect(lru.get('foo2')).toEqual('bar');
+    })
   });
 })

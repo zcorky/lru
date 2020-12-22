@@ -4,15 +4,49 @@ export interface Option {
 }
 
 export interface LRU<K, T> {
+  /**
+   * Get cache by key
+   * 
+   * @param key cache key
+   * @param option cache option
+   */
   get(key: K, option?: Option): T | undefined;
+
+  /**
+   * Set cache by key
+   * 
+   * @param key cache key
+   * @param value cache value
+   * @param option cache option
+   */
   set(key: K, value: T, option?: Option): void;
+  
   // remove(key: string): void;
   // removeAll(): void;
   // forEach(fn: Function): void;
   // toJSON(): object;
   // toString(): string;
-  hits(): Hits
-  hasKey(key: K): boolean
+  
+  /**
+   * Caculate hit rates
+   */
+  hits(): Hits;
+
+  /**
+   * Check if cache exist by key
+   * 
+   * @param key cache key
+   * 
+   * @deprecated since version 1.0.5
+   */
+  hasKey(key: K): boolean;
+
+  /**
+   * Check if cache exist by key
+   * 
+   * @param key cache key
+   */
+  has(key: K): boolean;
 }
 
 export interface Hits {
@@ -118,12 +152,16 @@ export class lru<K, T> implements LRU<K, T> { // tslint:disable-line
   }
 
   public hasKey(key: K) {
-    if (this.cache.has(key) || this.cache.has(key)) {
+    if (this.cache.has(key) || this._cache.has(key)) {
       const data = this.get(key);
       return data !== undefined;
     }
 
     return false;
+  }
+
+  public has(key: K) {
+    return this.hasKey(key);
   }
 
   public hits() {
